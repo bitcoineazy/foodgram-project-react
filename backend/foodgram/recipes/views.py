@@ -1,3 +1,12 @@
-from django.shortcuts import render
+from rest_framework import viewsets, permissions
 
-# Create your views here.
+from .models import *
+from .serializers import *
+
+
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = TagSerializer
+    queryset = Tag.objects.all()
+    permission_classes = (permissions.AllowAny, )
+
+

@@ -2,6 +2,7 @@ version: '3.3'
 services:
   db:
     image: postgres:12.4
+    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
@@ -23,7 +24,7 @@ services:
       context: ../frontend
       dockerfile: Dockerfile
     volumes:
-      - frontend_value:/app/result_build/build
+      - frontend_value:/app/build/
     depends_on:
       - db
 
