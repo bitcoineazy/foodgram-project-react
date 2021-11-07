@@ -77,7 +77,7 @@ class Recipe(models.Model):
         help_text='Выберите один или несколько тегов'
     )
     cooking_time = models.PositiveIntegerField(
-        verbose_name='Время приготовления (в мин)', default=1,
+        verbose_name='Время приготовления, минут', default=1,
     )
 
     class Meta:
@@ -107,3 +107,43 @@ class IngredientForRecipe(models.Model):
 
     def __str__(self):
         return f'{self.recipe}: {self.ingredient}'
+
+
+class Purchase(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='purchases')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,)
+    pub_date = models.DateTimeField(auto_now_add=True,
+                                    verbose_name='Дата добавления')
+
+    class Meta:
+        verbose_name = 'Покупка'
+        verbose_name_plural = 'Покупки'
+        ordering = ['-pub_date']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'], name='unique_shopping_cart'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.recipe} в корзине у {self.user}'
+
+
+class Favourites(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    pub_date = models.DateTimeField(auto_now_add=True,
+                                    verbose_name='Дата добавления')
+
+    class Meta:
+        verbose_name = 'Избранное'
+        verbose_name_plural = verbose_name
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'], name='unique_favorite',
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.recipe} в избранном у {self.user}'

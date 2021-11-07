@@ -11,10 +11,27 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'measure_unit')
+    list_display = ('id', 'name', 'measure_unit')
     list_filter = ('name',)
     search_fields = ('name',)
 
 
+class RecipeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'author')
+    list_filter = ('name', 'author', 'tags')
+    search_fields = ('name', 'author', 'tags')
+
+
+class IngredientForRecipeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'ingredient', 'recipe', 'amount')
+
+
+class FavouritesAdmin(admin.ModelAdmin):
+    list_display = ('id', 'recipe', 'user')
+
+
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
+admin.site.register(Ingredient, RecipeAdmin)
+admin.site.register(Ingredient, IngredientForRecipeAdmin)
+admin.site.register(Ingredient, FavouritesAdmin)
