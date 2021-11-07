@@ -1,3 +1,20 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 
-# Register your models here.
+from .models import Follow
+
+User = get_user_model()
+
+
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('id', 'email', 'username', 'first_name', 'last_name')
+    list_filter = ('email', 'username')
+
+
+class FollowAdmin(admin.ModelAdmin):
+    list_display = ('author', 'user', 'creation_date')
+    list_filter = ('creation_date',)
+
+
+admin.site.register(User, UserAdmin)
+admin.site.register(Follow, FollowAdmin)
