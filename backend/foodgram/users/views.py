@@ -8,7 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from .models import Follow
-from .serializers import FollowSerializer, ShowFollowsSerializer
+from .serializers import FollowSerializer, GetFollowingsSerializer
 
 User = get_user_model()
 
@@ -27,7 +27,7 @@ class CustomUserViewSet(UserViewSet):
         if request.method == "GET":
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)
-            serializer = ShowFollowsSerializer(author)
+            serializer = GetFollowingsSerializer(author)
             return Response(serializer.data, status=HTTP_201_CREATED)
         follow = get_object_or_404(Follow, user=request.user, author__id=id)
         follow.delete()
@@ -44,6 +44,6 @@ class CustomUserViewSet(UserViewSet):
         paginator = PageNumberPagination()
         paginator.page_size = 6
         result_page = paginator.paginate_queryset(user_obj, request)
-        serializer = ShowFollowsSerializer(
+        serializer = GetFollowingsSerializer(
             result_page, many=True, context={'current_user': request.user})
         return paginator.get_paginated_response(serializer.data)

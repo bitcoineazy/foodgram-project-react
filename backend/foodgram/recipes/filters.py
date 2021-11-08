@@ -11,7 +11,7 @@ class RecipeFilter(filters.FilterSet):
         fields = ('author', 'tags')
 
 
-class IngredientNameFilter(filters.FilterSet):
+class IngredientFilter(filters.FilterSet):
     name = filters.CharFilter(field_name='name')
 
     class Meta:

@@ -10,14 +10,12 @@ class Tag(models.Model):
         verbose_name='Имя тега',
         help_text='Введите название тега',
         max_length=200,
-        unique=True,
-    )
+        unique=True)
     color = ColorField(
         verbose_name='HEX-код',
         help_text='Введите цветовой HEX-код',
         unique=True,
-        null=True,
-    )
+        null=True)
     slug = models.SlugField(verbose_name='slug', max_length=64, unique=True)
 
     class Meta:
@@ -88,16 +86,16 @@ class IngredientForRecipe(models.Model):
         return f'{self.recipe}: {self.ingredient}'
 
 
-class Purchase(models.Model):
+class Order(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='purchases')
+        User, on_delete=models.CASCADE, related_name='orders')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(
         auto_now_add=True, verbose_name='Дата добавления')
 
     class Meta:
-        verbose_name = 'Покупка'
-        verbose_name_plural = 'Покупки'
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказы'
         ordering = ['-pub_date']
         constraints = [models.UniqueConstraint(
             fields=['user', 'recipe'], name='unique_shopping_cart')]
@@ -116,7 +114,7 @@ class Favourites(models.Model):
         verbose_name = 'Избранное'
         verbose_name_plural = verbose_name
         constraints = [models.UniqueConstraint(
-            fields=['user', 'recipe'], name='unique_favorite')]
+            fields=['user', 'recipe'], name='unique_favourite')]
 
     def __str__(self):
         return f'{self.recipe} в избранном у {self.user}'

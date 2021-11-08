@@ -13,7 +13,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed')
+        fields = ('email', 'id', 'username',
+                  'first_name', 'last_name', 'is_subscribed')
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
@@ -28,7 +29,7 @@ class RecipeSubscriptionSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "image", "cooking_time"]
 
 
-class ShowFollowsSerializer(CustomUserSerializer):
+class GetFollowingsSerializer(CustomUserSerializer):
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
@@ -61,7 +62,8 @@ class FollowSerializer(serializers.ModelSerializer):
             user=user, author__id=author
         ).exists()
         if user == author:
-            raise serializers.ValidationError({"errors": 'Нельзя подписаться на самого себя'})
+            raise serializers.ValidationError(
+                {"errors": 'Нельзя подписаться на самого себя'})
         elif follow_exist:
             raise serializers.ValidationError({"errors": 'Уже подписаны'})
         return data
