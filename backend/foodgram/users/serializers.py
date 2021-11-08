@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from .models import Follow
-from ..recipes.models import Recipe
+from recipes.models import Recipe
 
 User = get_user_model()
 

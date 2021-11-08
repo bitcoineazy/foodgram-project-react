@@ -8,8 +8,7 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
 from django.http.response import HttpResponse
 
-
-from .users.serializers import RecipeSubscriptionSerializer
+from users.serializers import RecipeSubscriptionSerializer
 from .models import *
 from .permissions import *
 from .serializers import *
@@ -19,13 +18,13 @@ from .filters import *
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
     pagination_class = None
     filterset_class = IngredientFilter
 
@@ -77,7 +76,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         favorite.delete()
         return Response(
             data={'message': f'{favorite.recipe} удален из избранного у '
-                           f'пользователя {request.user}'},
+                             f'пользователя {request.user}'},
             status=HTTP_204_NO_CONTENT)
 
 
@@ -92,21 +91,21 @@ def download_cart(request):
     for item in ingredients_in_recipe:
         amount = item.amount
         name = item.ingredient.name
-        measurement_unit = item.ingredient.measurement_unit
+        measure_unit = item.ingredient.measure_unit
         if name not in buying_list:
             buying_list[name] = {
                 'amount': amount,
-                'measurement_unit': measurement_unit
+                'measure_unit': measure_unit
             }
         else:
             buying_list[name]['amount'] = (
-                buying_list[name]['amount'] + amount
+                    buying_list[name]['amount'] + amount
             )
     shopping_list = []
     for item in buying_list:
         shopping_list.append(
             f'{item} - {buying_list[item]["amount"]}, '
-            f'{buying_list[item]["measurement_unit"]}\n'
+            f'{buying_list[item]["measure_unit"]}\n'
         )
     response = HttpResponse(shopping_list, 'Content-Type: text/plain')
     response['Content-Disposition'] = (
@@ -137,5 +136,5 @@ class CartView(APIView):
         cart.delete()
         return Response(
             data={'message': f'Рецепт {cart.recipe} удален из корзины у '
-                           f'пользователя {user}'},
+                             f'пользователя {user}'},
             status=HTTP_204_NO_CONTENT)

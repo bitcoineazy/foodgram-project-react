@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from drf_extra_fields.fields import Base64ImageField
 
-from .users.serializers import CustomUserSerializer
+from users.serializers import CustomUserSerializer
 from .models import *
 
 
@@ -20,13 +20,13 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class IngredientForRecipeSerializer(serializers.ModelSerializer):
     name = serializers.ReadOnlyField(source='ingredient.name', read_only=True)
-    measurement_unit = serializers.ReadOnlyField(
-        source='ingredient.measurement_unit', read_only=True
+    measure_unit = serializers.ReadOnlyField(
+        source='ingredient.measure_unit', read_only=True
     )
 
     class Meta:
         model = IngredientForRecipe
-        fields = ['id', 'name', 'amount', 'measurement_unit']
+        fields = ['id', 'name', 'amount', 'measure_unit']
 
 
 class IngredientForRecipeCreate(IngredientForRecipeSerializer):

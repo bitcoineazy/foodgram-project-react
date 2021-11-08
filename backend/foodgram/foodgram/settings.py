@@ -132,9 +132,7 @@ DJOSER = {
     'HIDE_USERS': False,
     'SERIALIZERS': {
         'users': 'users.serializers.CustomUserSerializer',
-
     },
-
     'PERMISSIONS': {
         'activation': ['rest_framework.permissions.AllowAny'],
         'password_reset': ['rest_framework.permissions.AllowAny'],
