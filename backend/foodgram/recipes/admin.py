@@ -17,9 +17,9 @@ class IngredientAdmin(admin.ModelAdmin):
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author')
-    list_filter = ('name', 'author', 'tags')
-    search_fields = ('name', 'author', 'tags')
+    list_display = ('id', 'name', 'author_id')
+    list_filter = ('name', 'author_id', 'tags')
+    search_fields = ('name', 'author_id', 'tags')
 
 
 class IngredientForRecipeAdmin(admin.ModelAdmin):

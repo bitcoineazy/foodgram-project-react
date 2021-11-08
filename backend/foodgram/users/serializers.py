@@ -26,7 +26,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 class RecipeSubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
-        fields = ["id", "name", "image", "cooking_time"]
+        fields = ['id', 'name', 'image', 'cooking_time']
 
 
 class GetFollowingsSerializer(CustomUserSerializer):
@@ -39,7 +39,7 @@ class GetFollowingsSerializer(CustomUserSerializer):
                   'last_name', 'is_subscribed', 'recipes', 'recipes_count')
 
     def get_recipes(self, obj):
-        recipes = Recipe.objects.filter(author=obj)
+        recipes = Recipe.objects.filter(author_id=obj)
         return RecipeSubscriptionSerializer(recipes, many=True).data
 
     def get_recipes_count(self, obj):
@@ -59,8 +59,7 @@ class FollowSerializer(serializers.ModelSerializer):
         user = data['user']['id']
         author = data['author']['id']
         follow_exist = Follow.objects.filter(
-            user=user, author__id=author
-        ).exists()
+            user=user, author__id=author).exists()
         if user == author:
             raise serializers.ValidationError(
                 {"errors": 'Нельзя подписаться на самого себя'})

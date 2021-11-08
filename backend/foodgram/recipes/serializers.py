@@ -50,7 +50,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField(max_length=None, use_url=True)
     is_in_shopping_cart = serializers.SerializerMethodField()
     is_in_favourites = serializers.SerializerMethodField()
-    author = CustomUserSerializer(read_only=True)
+    author_id = CustomUserSerializer(read_only=True)
     ingredients = IngredientForRecipeCreate(many=True)
 
     class Meta:
@@ -62,7 +62,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         is_recipe_exist = Recipe.objects.filter(name=data['name']).exists
         if request.method == 'POST' and is_recipe_exist:
             raise serializers.ValidationError(
-                {"errors": f"Рецепт с таким названием:"
+                {'errors': f'Рецепт с таким названием:'
                            f" {data['name']} уже существует"})
         return data
 
@@ -83,7 +83,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         ingredients = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
-        recipe = Recipe.objects.create(author=request.user, **validated_data)
+        recipe = Recipe.objects.create(
+            author_id=request.user, **validated_data)
         recipe.tags.set(tags_data)
         ingredient_in_recipe = [IngredientForRecipe(
             recipe=recipe,
@@ -122,19 +123,19 @@ class FavouriteSerializer(serializers.ModelSerializer):
         user = data['user']['id']
         recipe = data['recipe']['id']
         if Favourites.objects.filter(user=user, recipe__id=recipe).exists():
-            raise serializers.ValidationError({"errors": "Уже в избранном"})
+            raise serializers.ValidationError({'errors': 'Уже в избранном'})
         return data
 
     def create(self, validated_data):
-        user = validated_data["user"]
-        recipe = validated_data["recipe"]
+        user = validated_data['user']
+        recipe = validated_data['recipe']
         Favourites.objects.get_or_create(user=user, recipe=recipe)
         return validated_data
 
 
 class RecipeGetSerializer(RecipeSerializer):
     tags = TagSerializer(read_only=True, many=True)
-    author = CustomUserSerializer(read_only=True)
+    author_id = CustomUserSerializer(read_only=True)
     ingredients = serializers.SerializerMethodField()
 
     def get_ingredients(self, obj):
