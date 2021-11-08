@@ -29,21 +29,15 @@ class IngredientForRecipeSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'amount', 'measure_unit']
 
 
-class IngredientForRecipeCreate(IngredientForRecipeSerializer):
+class IngredientForRecipeCreateSerializer(IngredientForRecipeSerializer):
     id = serializers.IntegerField(write_only=True)
     amount = serializers.IntegerField(write_only=True)
 
-    def validate_amount(self, amount):
-        if amount < 1:
-            raise serializers.ValidationError(
-                'Убедитесь, что это значение больше 0.')
-        return amount
-
     def to_representation(self, instance):
-        ingredient_in_recipe = [item for item in
-                                IngredientForRecipe.objects.filter(
-                                    ingredient=instance)]
-        return IngredientForRecipeSerializer(ingredient_in_recipe).data
+        recipe = [i for i in instance.recipe_set.all()]
+        return IngredientForRecipeSerializer(
+            IngredientForRecipe.objects.filter(
+                recipe=recipe[0].id), many=True).data
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -51,7 +45,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField()
     is_in_favourites = serializers.SerializerMethodField()
     author_id = CustomUserSerializer(read_only=True)
-    ingredients = IngredientForRecipeCreate(many=True)
+    ingredients = IngredientForRecipeCreateSerializer(many=True)
 
     class Meta:
         model = Recipe
@@ -59,11 +53,21 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         request = self.context['request']
-        is_recipe_exist = Recipe.objects.filter(name=data['name']).exists
-        if request.method == 'POST' and is_recipe_exist:
-            raise serializers.ValidationError(
-                {'errors': f'Рецепт с таким названием:'
-                           f" {data['name']} уже существует"})
+        ingredients = data['ingredients']
+        exist_recipe = Recipe.objects.filter(name=data['name']).exists()
+        if request.method == 'POST' and exist_recipe:
+            raise serializers.ValidationError({
+                'errors': f"Рецепт с таким названием: {data['name']} уже "
+                          f"существует"})
+        unique_ingredients = []
+        for ingredient in ingredients:
+            if ingredient['id'] in unique_ingredients:
+                raise serializers.ValidationError(
+                    {'errors': 'Такой ингредиент уже существует'})
+            elif ingredient['amount'] < 1:
+                raise serializers.ValidationError(
+                    {'amount': 'Укажите значение > 0'})
+            unique_ingredients.append(ingredient['id'])
         return data
 
     def get_is_in_shopping_cart(self, obj):
@@ -89,8 +93,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredient_in_recipe = [IngredientForRecipe(
             recipe=recipe,
             ingredient=get_object_or_404(Ingredient, pk=ingredient['id']),
-            amount=ingredient['amount']
-        ) for ingredient in ingredients]
+            amount=ingredient['amount']) for ingredient in ingredients]
         IngredientForRecipe.objects.bulk_create(ingredient_in_recipe)
         recipe.save()
         return recipe
@@ -102,8 +105,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredient_in_recipe = [IngredientForRecipe(
             recipe=recipe,
             ingredient=get_object_or_404(Ingredient, id=ingredient['id']),
-            amount=ingredient['amount']
-        ) for ingredient in ingredients]
+            amount=ingredient['amount']) for ingredient in ingredients]
         IngredientForRecipe.objects.bulk_create(ingredient_in_recipe)
         if validated_data.get('image') is not None:
             recipe.image = validated_data.get('image', recipe.image)
@@ -156,8 +158,5 @@ class OrderSerializer(serializers.ModelSerializer):
         recipe = data['recipe']['id']
         if Order.objects.filter(user=user, recipe__id=recipe).exists():
             raise serializers.ValidationError(
-                {
-                    "errors": "Вы уже добавили рецепт в корзину"
-                }
-            )
+                {'errors': 'Рецепт уже в корзине'})
         return data
