@@ -9,10 +9,10 @@ from rest_framework.views import APIView
 from django.http.response import HttpResponse
 
 
+from .users.serializers import RecipeSubscriptionSerializer
 from .models import *
 from .permissions import *
 from .serializers import *
-from ..users.serializers import RecipeSubscriptionSerializer
 from .filters import *
 
 

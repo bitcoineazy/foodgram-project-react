@@ -32,6 +32,6 @@ class FavouritesAdmin(admin.ModelAdmin):
 
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
-admin.site.register(Ingredient, RecipeAdmin)
-admin.site.register(Ingredient, IngredientForRecipeAdmin)
-admin.site.register(Ingredient, FavouritesAdmin)
+admin.site.register(Recipe, RecipeAdmin)
+admin.site.register(IngredientForRecipe, IngredientForRecipeAdmin)
+admin.site.register(Favourites, FavouritesAdmin)
