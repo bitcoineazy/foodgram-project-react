@@ -43,13 +43,13 @@ class RecipesViewSet(viewsets.ModelViewSet):
         is_in_favourites = self.request.query_params.get("is_in_favourites")
         user_favourites = Favourites.objects.filter(user=self.request.user.id)
         if is_in_shopping_cart == "true":
-            queryset = queryset.filter(purchase__in=user_cart)
+            queryset = queryset.filter(order__in=user_cart)
         if is_in_shopping_cart == "false":
-            queryset = queryset.exclude(purchase__in=user_cart)
+            queryset = queryset.exclude(order__in=user_cart)
         if is_in_favourites == "true":
-            queryset = queryset.filter(favorites__in=user_favourites)
+            queryset = queryset.filter(favourites__in=user_favourites)
         if is_in_favourites == "false":
-            queryset = queryset.exclude(favorites__in=user_favourites)
+            queryset = queryset.exclude(favourites__in=user_favourites)
         return queryset.all()
 
     def get_serializer_class(self):
@@ -59,7 +59,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     @action(methods=["GET", "DELETE"],
             url_path='favourite', url_name='favourite',
-            permission_classes=[permissions.IsAuthenticated], detail=True)
+            permission_classes=[IsAuthenticated], detail=True)
     def favourite(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         serializer = FavouriteSerializer(
@@ -85,7 +85,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
 def download_cart(request):
     user = request.user
     ingredients_in_recipe = IngredientForRecipe.objects.filter(
-        recipe__purchase__user=user
+        recipe__order__user=user
     )
     buying_list = {}
     for item in ingredients_in_recipe:
@@ -115,7 +115,7 @@ def download_cart(request):
 
 
 class CartView(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     http_method_names = ['get', 'delete']
 
     def get(self, request, recipe_id):
