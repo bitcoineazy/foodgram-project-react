@@ -14,7 +14,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 class IngredientSerializer(serializers.ModelSerializer):
     name = serializers.ReadOnlyField()
-    measure_unit = serializers.ReadOnlyField()
+    measurement_unit = serializers.ReadOnlyField()
 
     class Meta:
         model = Ingredient
@@ -23,12 +23,12 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class IngredientForRecipeSerializer(serializers.ModelSerializer):
     name = serializers.ReadOnlyField(source='ingredient.name', read_only=True)
-    measure_unit = serializers.ReadOnlyField(
-        source='ingredient.measure_unit', read_only=True)
+    measurement_unit = serializers.ReadOnlyField(
+        source='ingredient.measurement_unit', read_only=True)
 
     class Meta:
         model = IngredientForRecipe
-        fields = ['id', 'name', 'amount', 'measure_unit']
+        fields = ['id', 'name', 'amount', 'measurement_unit']
 
 
 class IngredientForRecipeCreateSerializer(IngredientForRecipeSerializer):
@@ -44,11 +44,11 @@ class IngredientForRecipeCreateSerializer(IngredientForRecipeSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField(max_length=None, use_url=True)
+    is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
-    is_in_favourites = serializers.SerializerMethodField()
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True)
-    author_id = CustomUserSerializer(read_only=True)
+    author = CustomUserSerializer(read_only=True)
     ingredients = IngredientForRecipeCreateSerializer(many=True)
 
     class Meta:
@@ -80,7 +80,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             return False
         return Order.objects.filter(user=request.user, recipe=obj).exists()
 
-    def get_is_in_favourites(self, obj):
+    def get_is_favorited(self, obj):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
@@ -92,7 +92,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
         recipe = Recipe.objects.create(
-            author_id=request.user, **validated_data)
+            author=request.user, **validated_data)
         recipe.tags.set(tags_data)
         ingredient_in_recipe = [IngredientForRecipe(
             recipe=recipe,
@@ -141,7 +141,7 @@ class FavouriteSerializer(serializers.ModelSerializer):
 
 class RecipeGetSerializer(RecipeSerializer):
     tags = TagSerializer(read_only=True, many=True)
-    author_id = CustomUserSerializer(read_only=True)
+    author = CustomUserSerializer(read_only=True)
     ingredients = serializers.SerializerMethodField()
 
     def get_ingredients(self, obj):

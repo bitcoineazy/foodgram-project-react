@@ -1,5 +1,4 @@
 from django.contrib import admin
-from import_export.admin import ImportMixin
 
 from .models import *
 
@@ -12,15 +11,15 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'measure_unit')
+    list_display = ('id', 'name', 'measurement_unit')
     list_filter = ('name',)
     search_fields = ('name',)
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author_id')
-    list_filter = ('name', 'author_id', 'tags')
-    search_fields = ('name', 'author_id', 'tags')
+    list_display = ('id', 'name', 'author')
+    list_filter = ('name', 'author', 'tags')
+    search_fields = ('name', 'author', 'tags')
 
 
 class IngredientForRecipeAdmin(admin.ModelAdmin):

@@ -1,9 +1,6 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model
 
-from .models import Follow
-
-User = get_user_model()
+from .models import Follow, CustomUser
 
 
 class FollowAdmin(admin.ModelAdmin):
@@ -16,5 +13,5 @@ class UserAdmin(admin.ModelAdmin):
     list_filter = ('username', 'email')
 
 
-admin.site.register(User, UserAdmin)
+admin.site.register(CustomUser, UserAdmin)
 admin.site.register(Follow, FollowAdmin)

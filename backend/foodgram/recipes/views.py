@@ -8,7 +8,7 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
 from django.http.response import HttpResponse
 
-from users.serializers import RecipeSubscriptionSerializer
+from users.serializers import RecipeInSubscriptionSerializer
 from .permissions import AdminOrAuthorOrReadOnly
 from .models import *
 from .serializers import *
@@ -41,7 +41,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         is_in_shopping_cart = self.request.query_params.get(
             "is_in_shopping_cart")
         user_cart = Order.objects.filter(user=self.request.user.id)
-        is_in_favourites = self.request.query_params.get("is_in_favourites")
+        is_in_favourites = self.request.query_params.get('is_favorited')
         user_favourites = Favourites.objects.filter(user=self.request.user.id)
         if is_in_shopping_cart == 'true':
             queryset = queryset.filter(order__in=user_cart)
@@ -68,7 +68,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         if request.method == "GET":
             serializer.is_valid(raise_exception=True)
             serializer.save(recipe=recipe, user=request.user)
-            serializer = RecipeSubscriptionSerializer(recipe)
+            serializer = RecipeInSubscriptionSerializer(recipe)
             return Response(serializer.data, status=HTTP_201_CREATED)
         favourite = get_object_or_404(
             Favourites, user=request.user, recipe__id=pk)
@@ -90,11 +90,11 @@ def download_cart(request):
     for item in ingredients_in_recipe:
         amount = item.amount
         name = item.ingredient.name
-        measure_unit = item.ingredient.measure_unit
+        measurement_unit = item.ingredient.measurement_unit
         if name not in buying_list:
             buying_list[name] = {
                 'amount': amount,
-                'measure_unit': measure_unit
+                'measurement_unit': measurement_unit
             }
         else:
             buying_list[name]['amount'] = (
@@ -104,7 +104,7 @@ def download_cart(request):
     for item in buying_list:
         shopping_list.append(
             f'{item} - {buying_list[item]["amount"]}, '
-            f'{buying_list[item]["measure_unit"]}\n'
+            f'{buying_list[item]["measurement_unit"]}\n'
         )
     response = HttpResponse(shopping_list, 'Content-Type: text/plain')
     response['Content-Disposition'] = (
@@ -126,7 +126,7 @@ class CartView(APIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save(recipe=recipe, user=request.user)
-        serializer = RecipeSubscriptionSerializer(recipe)
+        serializer = RecipeInSubscriptionSerializer(recipe)
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     def delete(self, request, recipe_id):
