@@ -1,7 +1,6 @@
 from django.contrib import admin
 from import_export.admin import ImportMixin
 
-from .resources import IngredientResource
 from .models import *
 
 
@@ -13,9 +12,9 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class IngredientAdmin(ImportMixin, admin.ModelAdmin):
-    resource_class = IngredientResource
-    search_fields = ('name',)
+    list_display = ('id', 'name', 'measurement_unit',)
     list_filter = ('id', 'name', 'measurement_unit',)
+    search_fields = ('name',)
 
 
 class RecipeAdmin(admin.ModelAdmin):
