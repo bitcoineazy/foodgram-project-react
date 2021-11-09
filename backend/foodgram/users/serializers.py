@@ -64,7 +64,7 @@ class FollowSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"errors": 'Нельзя подписаться на самого себя'})
         elif follow_exist:
-            raise serializers.ValidationError({"errors": 'Уже подписаны'})
+            raise serializers.ValidationError({'errors': 'Уже подписаны'})
         return data
 
     def create(self, validated_data):

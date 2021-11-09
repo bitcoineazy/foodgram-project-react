@@ -10,7 +10,7 @@ from django.http.response import HttpResponse
 
 from users.serializers import RecipeSubscriptionSerializer
 from .models import *
-from .permissions import *
+from .permissions import AdminOrAuthorOrReadOnly
 from .serializers import *
 from .filters import *
 
@@ -34,7 +34,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     filter_backends = [rest_framework.DjangoFilterBackend]
     filter_class = RecipeFilter
     pagination_class = PageNumberPagination
-    permission_classes = [AuthorOrAdminOrReadOnly, ]
+    permission_classes = [AdminOrAuthorOrReadOnly, ]
 
     def get_queryset(self):
         queryset = Recipe.objects.all()
