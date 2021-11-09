@@ -1,11 +1,11 @@
-from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from .models import Follow
 from recipes.models import Recipe
 
-User = settings.AUTH_USER_MODEL
+User = get_user_model()
 
 
 class CustomUserSerializer(serializers.ModelSerializer):

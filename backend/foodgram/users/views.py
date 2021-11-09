@@ -1,4 +1,4 @@
-from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from .models import Follow
 from .serializers import FollowSerializer, GetFollowingsSerializer
 
-User = settings.AUTH_USER_MODEL
+User = get_user_model()
 
 
 class CustomUserViewSet(UserViewSet):

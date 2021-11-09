@@ -43,13 +43,13 @@ class RecipesViewSet(viewsets.ModelViewSet):
         user_cart = Order.objects.filter(user=self.request.user.id)
         is_in_favourites = self.request.query_params.get("is_in_favourites")
         user_favourites = Favourites.objects.filter(user=self.request.user.id)
-        if is_in_shopping_cart == "true":
+        if is_in_shopping_cart == 'true':
             queryset = queryset.filter(order__in=user_cart)
-        if is_in_shopping_cart == "false":
+        if is_in_shopping_cart == 'false':
             queryset = queryset.exclude(order__in=user_cart)
-        if is_in_favourites == "true":
+        if is_in_favourites == 'true':
             queryset = queryset.filter(favourites__in=user_favourites)
-        if is_in_favourites == "false":
+        if is_in_favourites == 'false':
             queryset = queryset.exclude(favourites__in=user_favourites)
         return queryset.all()
 
@@ -58,7 +58,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             return RecipeGetSerializer
         return RecipeSerializer
 
-    @action(methods=["GET", "DELETE"],
+    @action(methods=['GET', 'DELETE'],
             url_path='favourite', url_name='favourite',
             permission_classes=[IsAuthenticated], detail=True)
     def favourite(self, request, pk):
