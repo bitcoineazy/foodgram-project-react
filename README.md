@@ -26,10 +26,19 @@
 
 1. Склонировать репозиторий: ```git clone git@github.com:bitcoineazy/foodgram-project-react.git```
 2. Установить: [docker](https://www.docker.com/get-started), [docker-compose](https://docs.docker.com/compose/install/)
-3. Перейти в директорию infra cобрать проект и запустить: ```sudo docker-compose up --build``` 
-4. Собрать базу данных на основе ресурсов: ```sudo docker-compose exec backend python manage.py makemigrations && sudo docker-compose exec backend python manage.py migrate```
-5. Создать профиль администратора: ```sudo docker-compose exec web python manage.py createsuperuser```
-6. Собрать статику: ```sudo docker-compose exec web python manage.py collectstatic``` 
+3. Создать .env файл со значениями: 
+```
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+DB_HOST=db
+DB_PORT=5432
+```
+4. Перейти в директорию infra cобрать проект и запустить: ```sudo docker-compose up --build``` 
+5. Собрать базу данных на основе ресурсов: ```sudo docker-compose exec backend python manage.py makemigrations && sudo docker-compose exec backend python manage.py migrate```
+6. Создать профиль администратора: ```sudo docker-compose exec web python manage.py createsuperuser```
+7. Собрать статику: ```sudo docker-compose exec web python manage.py collectstatic``` 
 
 Для сборки и использования своего контейнера backend:
 1. В директории backend/foodgram - ```sudo docker build -t username/container .```
