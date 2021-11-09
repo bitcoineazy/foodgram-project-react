@@ -20,7 +20,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return Follow.objects.filter(user=request.user, author=obj).exists()
 
 
-class RecipeSubscriptionSerializer(serializers.ModelSerializer):
+class RecipeInSubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ['id', 'name', 'image', 'cooking_time']
@@ -36,8 +36,8 @@ class GetFollowingsSerializer(CustomUserSerializer):
                   'last_name', 'is_subscribed', 'recipes', 'recipes_count']
 
     def get_recipes(self, obj):
-        recipes = Recipe.objects.filter(author_id=obj)
-        return RecipeSubscriptionSerializer(recipes, many=True).data
+        recipes = Recipe.objects.filter(author=obj)
+        return RecipeInSubscriptionSerializer(recipes, many=True).data
 
     def get_recipes_count(self, obj):
         queryset = Recipe.objects.filter(author=obj)

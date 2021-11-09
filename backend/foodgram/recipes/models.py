@@ -1,8 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from colorfield.fields import ColorField
 from django.core.validators import RegexValidator
 
-from users.models import CustomUser
+User = get_user_model()
 
 
 class Tag(models.Model):
@@ -35,10 +36,10 @@ class Ingredient(models.Model):
         max_length=200,
         verbose_name='Название ингредиента',
         help_text='Введите название ингредиента')
-    measure_unit = models.CharField(
+    measurement_unit = models.CharField(
         max_length=20,
         verbose_name='Единица измерения',
-        help_text='Выберите единицу измерения', )
+        help_text='Введите единицу измерения', )
 
     class Meta:
         ordering = ['name']
@@ -46,12 +47,12 @@ class Ingredient(models.Model):
         verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
-        return f'{self.name}, {self.measure_unit}'
+        return f'{self.name}, {self.measurement_unit}'
 
 
 class Recipe(models.Model):
-    author_id = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE,
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE,
         related_name='recipes', verbose_name='Автор рецепта')
     name = models.CharField(max_length=50, verbose_name='Название рецепта')
     pub_date = models.DateTimeField(
@@ -91,7 +92,7 @@ class IngredientForRecipe(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name='orders')
+        User, on_delete=models.CASCADE, related_name='orders')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(
         auto_now_add=True, verbose_name='Дата добавления')
@@ -108,7 +109,7 @@ class Order(models.Model):
 
 
 class Favourites(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(
         auto_now_add=True, verbose_name='Дата добавления')

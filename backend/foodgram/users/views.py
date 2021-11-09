@@ -12,7 +12,7 @@ from .serializers import FollowSerializer, GetFollowingsSerializer
 
 class CustomUserViewSet(UserViewSet):
     @action(detail=True,
-            methods=["GET", "DELETE"],
+            methods=['GET', 'DELETE'],
             url_path='subscribe',
             url_name='subscribe',
             permission_classes=[IsAuthenticated])
@@ -31,7 +31,7 @@ class CustomUserViewSet(UserViewSet):
                         status=HTTP_204_NO_CONTENT)
 
     @action(detail=False,
-            methods=["GET"],
+            methods=['GET'],
             url_path='subscriptions',
             url_name='subscriptions',
             permission_classes=[IsAuthenticated])
