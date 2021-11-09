@@ -19,6 +19,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
     permission_classes = (AllowAny,)
+    pagination_class = None
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
@@ -63,19 +64,17 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def favourite(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         serializer = FavouriteSerializer(
-            data={'user': request.user.id, 'recipe': recipe.id}
-        )
+            data={'user': request.user.id, 'recipe': recipe.id})
         if request.method == "GET":
             serializer.is_valid(raise_exception=True)
             serializer.save(recipe=recipe, user=request.user)
             serializer = RecipeSubscriptionSerializer(recipe)
             return Response(serializer.data, status=HTTP_201_CREATED)
-        favorite = get_object_or_404(
-            Favourites, user=request.user, recipe__id=pk
-        )
-        favorite.delete()
+        favourite = get_object_or_404(
+            Favourites, user=request.user, recipe__id=pk)
+        favourite.delete()
         return Response(
-            data={'message': f'{favorite.recipe} удален из избранного у '
+            data={'message': f'{favourite.recipe} удален из избранного у '
                              f'пользователя {request.user}'},
             status=HTTP_204_NO_CONTENT)
 

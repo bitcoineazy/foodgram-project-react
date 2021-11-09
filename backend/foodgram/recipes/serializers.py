@@ -13,6 +13,9 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+    name = serializers.ReadOnlyField()
+    measure_unit = serializers.ReadOnlyField()
+
     class Meta:
         model = Ingredient
         fields = '__all__'
@@ -21,8 +24,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 class IngredientForRecipeSerializer(serializers.ModelSerializer):
     name = serializers.ReadOnlyField(source='ingredient.name', read_only=True)
     measure_unit = serializers.ReadOnlyField(
-        source='ingredient.measure_unit', read_only=True
-    )
+        source='ingredient.measure_unit', read_only=True)
 
     class Meta:
         model = IngredientForRecipe
@@ -92,7 +94,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe.tags.set(tags_data)
         ingredient_in_recipe = [IngredientForRecipe(
             recipe=recipe,
-            ingredient=get_object_or_404(Ingredient, pk=ingredient['id']),
+            ingredient=get_object_or_404(Ingredient, id=ingredient['id']),
             amount=ingredient['amount']) for ingredient in ingredients]
         IngredientForRecipe.objects.bulk_create(ingredient_in_recipe)
         recipe.save()
