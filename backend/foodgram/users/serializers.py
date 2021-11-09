@@ -1,18 +1,15 @@
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from .models import Follow
+from .models import Follow, CustomUser
 from recipes.models import Recipe
-
-User = get_user_model()
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = ['email', 'id', 'username',
                   'first_name', 'last_name', 'is_subscribed']
 
@@ -34,7 +31,7 @@ class GetFollowingsSerializer(CustomUserSerializer):
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = ['email', 'id', 'username', 'first_name',
                   'last_name', 'is_subscribed', 'recipes', 'recipes_count']
 
@@ -69,6 +66,6 @@ class FollowSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         author = validated_data.get('author')
-        author = get_object_or_404(User, pk=author.get('id'))
+        author = get_object_or_404(CustomUser, pk=author.get('id'))
         user = validated_data.get('user')
         return Follow.objects.create(user=user, author=author)
