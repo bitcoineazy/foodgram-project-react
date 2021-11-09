@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+from django.conf.global_settings import AUTH_USER_MODEL
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
@@ -10,8 +10,6 @@ from rest_framework.response import Response
 from .models import Follow
 from .serializers import FollowSerializer, GetFollowingsSerializer
 
-User = get_user_model()
-
 
 class CustomUserViewSet(UserViewSet):
     @action(detail=True,
@@ -20,7 +18,7 @@ class CustomUserViewSet(UserViewSet):
             url_name='subscribe',
             permission_classes=[IsAuthenticated])
     def subscribe(self, request, id):
-        author = get_object_or_404(User, id=id)
+        author = get_object_or_404(AUTH_USER_MODEL, id=id)
         serializer = FollowSerializer(
             data={'user': request.user.id, 'author': id}
         )
@@ -40,7 +38,8 @@ class CustomUserViewSet(UserViewSet):
             url_name='subscriptions',
             permission_classes=[IsAuthenticated])
     def show_follows(self, request):
-        user_obj = User.objects.filter(following__user=request.user)
+        user_obj = AUTH_USER_MODEL.objects.filter(
+            following__user=request.user)
         paginator = PageNumberPagination()
         paginator.page_size = 6
         result_page = paginator.paginate_queryset(user_obj, request)

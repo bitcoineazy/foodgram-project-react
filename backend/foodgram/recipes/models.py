@@ -1,9 +1,8 @@
 from django.db import models
-from django.contrib.auth import get_user_model
+from django.conf.global_settings import AUTH_USER_MODEL
+
 from colorfield.fields import ColorField
 from django.core.validators import RegexValidator
-
-User = get_user_model()
 
 
 class Tag(models.Model):
@@ -39,7 +38,7 @@ class Ingredient(models.Model):
     measure_unit = models.CharField(
         max_length=20,
         verbose_name='Единица измерения',
-        help_text='Выберите единицу измерения',)
+        help_text='Выберите единицу измерения', )
 
     class Meta:
         ordering = ['name']
@@ -52,7 +51,7 @@ class Ingredient(models.Model):
 
 class Recipe(models.Model):
     author_id = models.ForeignKey(
-        User, on_delete=models.CASCADE,
+        AUTH_USER_MODEL, on_delete=models.CASCADE,
         related_name='recipes', verbose_name='Автор рецепта')
     name = models.CharField(max_length=50, verbose_name='Название рецепта')
     pub_date = models.DateTimeField(
@@ -92,7 +91,7 @@ class IngredientForRecipe(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='orders')
+        AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(
         auto_now_add=True, verbose_name='Дата добавления')
@@ -109,7 +108,7 @@ class Order(models.Model):
 
 
 class Favourites(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(
         auto_now_add=True, verbose_name='Дата добавления')
