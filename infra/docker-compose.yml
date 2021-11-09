@@ -12,8 +12,8 @@ services:
     image: noble6/foodgram:latest
     restart: always
     volumes:
-      - static_value:/var/html/static/
-      - media_value:/var/html/media/
+      - static_value:/code/static/
+      - media_value:/code/media/
     depends_on:
       - db
     env_file:
@@ -36,8 +36,8 @@ services:
       - frontend_value:/usr/share/nginx/html/
       - ../docs/redoc.html:/usr/share/nginx/html/api/docs/redoc.html
       - ../docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
-      - static_value:/var/html/static/
-      - media_value:/var/html/media/
+      - static_value:/static/
+      - media_value:/media/
     depends_on:
       - backend
       - frontend
