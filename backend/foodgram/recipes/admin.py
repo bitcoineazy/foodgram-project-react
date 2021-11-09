@@ -2,7 +2,6 @@ from django.contrib import admin
 from import_export.admin import ImportMixin
 
 from .models import *
-from .resources import IngredientResource
 
 
 class TagAdmin(admin.ModelAdmin):
@@ -12,10 +11,10 @@ class TagAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-class IngredientAdmin(ImportMixin, admin.ModelAdmin):
-    list_filter = ('id', 'name', 'measure_unit')
-    search_fields = ('name', )
-    resource_class = IngredientResource
+class IngredientAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'measure_unit')
+    list_filter = ('name',)
+    search_fields = ('name',)
 
 
 class RecipeAdmin(admin.ModelAdmin):
