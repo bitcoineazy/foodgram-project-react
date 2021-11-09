@@ -39,7 +39,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Recipe.objects.all()
         is_in_shopping_cart = self.request.query_params.get(
-            "is_in_shopping_cart")
+            'is_in_shopping_cart')
         user_cart = Order.objects.filter(user=self.request.user.id)
         is_in_favourites = self.request.query_params.get('is_favorited')
         user_favourites = Favourites.objects.filter(user=self.request.user.id)
@@ -98,7 +98,7 @@ def download_cart(request):
             }
         else:
             buying_list[name]['amount'] = (
-                    buying_list[name]['amount'] + amount
+                buying_list[name]['amount'] + amount
             )
     shopping_list = []
     for item in buying_list:

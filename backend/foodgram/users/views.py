@@ -20,7 +20,7 @@ class CustomUserViewSet(UserViewSet):
         author = get_object_or_404(CustomUser, id=id)
         serializer = FollowSerializer(
             data={'user': request.user.id, 'author': id})
-        if request.method == "GET":
+        if request.method == 'GET':
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)
             serializer = GetFollowingsSerializer(author)

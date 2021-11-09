@@ -59,7 +59,7 @@ class FollowSerializer(serializers.ModelSerializer):
             user=user, author__id=author).exists()
         if user == author:
             raise serializers.ValidationError(
-                {"errors": 'Нельзя подписаться на самого себя'})
+                {'errors': 'Нельзя подписаться на самого себя'})
         elif follow_exist:
             raise serializers.ValidationError({'errors': 'Уже подписаны'})
         return data
