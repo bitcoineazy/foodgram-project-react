@@ -13,8 +13,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username',
-                  'first_name', 'last_name', 'is_subscribed')
+        fields = ['email', 'id', 'username',
+                  'first_name', 'last_name', 'is_subscribed']
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
@@ -35,8 +35,8 @@ class GetFollowingsSerializer(CustomUserSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'is_subscribed', 'recipes', 'recipes_count')
+        fields = ['email', 'id', 'username', 'first_name',
+                  'last_name', 'is_subscribed', 'recipes', 'recipes_count']
 
     def get_recipes(self, obj):
         recipes = Recipe.objects.filter(author_id=obj)

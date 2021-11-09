@@ -46,6 +46,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField(max_length=None, use_url=True)
     is_in_shopping_cart = serializers.SerializerMethodField()
     is_in_favourites = serializers.SerializerMethodField()
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(), many=True)
     author_id = CustomUserSerializer(read_only=True)
     ingredients = IngredientForRecipeCreateSerializer(many=True)
 
