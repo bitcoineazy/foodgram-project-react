@@ -114,8 +114,12 @@ class RecipeSerializer(serializers.ModelSerializer):
         IngredientForRecipe.objects.bulk_create(ingredient_in_recipe)
         if validated_data.get('image') is not None:
             recipe.image = validated_data.get('image', recipe.image)
+        recipe.name = validated_data.pop('name')
+        recipe.text = validated_data.pop('text')
+        recipe.cooking_time = validated_data.pop('cooking_time')
+        recipe.save()
         recipe.tags.set(tags_data)
-        return super().update(recipe, validated_data)
+        return recipe
 
 
 class FavouriteSerializer(serializers.ModelSerializer):
