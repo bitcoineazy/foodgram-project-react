@@ -104,21 +104,15 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, recipe, validated_data):
-        ingredients = validated_data.pop('ingredients')
+        ingredients_in_recipe = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
-        recipe.ingredients.clear()
-        for ingredient in ingredients:
-            if ingredient['amount'] <= 0:
-                raise serializers.ValidationError(
-                    'Кол-во ингредиента должно быть больше 0')
-            recipe.ingredients.add(ingredient)
         if validated_data.get('image') is not None:
             recipe.image = validated_data.get('image', recipe.image)
         recipe.name = validated_data.pop('name')
         recipe.text = validated_data.pop('text')
         recipe.cooking_time = validated_data.pop('cooking_time')
         recipe.save()
-        recipe.ingredients.set(ingredients)
+        recipe.ingredients.set(ingredients_in_recipe)
         recipe.tags.set(tags_data)
         return recipe
 
