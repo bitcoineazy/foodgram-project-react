@@ -106,18 +106,18 @@ class RecipeSerializer(serializers.ModelSerializer):
     def update(self, recipe, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
+        recipe.ingredients.clear()
         ingredient_in_recipe = [IngredientForRecipe(
             recipe=recipe,
-            ingredient_id=ingredient.get('id'),
-            amount=ingredient.get('amount')) for ingredient in ingredients]
-        recipe.ingredients.clear()
-        IngredientForRecipe.objects.bulk_create(ingredient_in_recipe)
+            ingredient_id=ingredient['id'],
+            amount=ingredient['amount']) for ingredient in ingredients]
         if validated_data.get('image') is not None:
             recipe.image = validated_data.get('image', recipe.image)
         recipe.name = validated_data.pop('name')
         recipe.text = validated_data.pop('text')
         recipe.cooking_time = validated_data.pop('cooking_time')
         recipe.save()
+        recipe.ingredientforrecipe_set(ingredient_in_recipe)
         recipe.tags.set(tags_data)
         return recipe
 
