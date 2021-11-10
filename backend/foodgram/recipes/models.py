@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from colorfield.fields import ColorField
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MinValueValidator
 
 User = get_user_model()
 
@@ -66,7 +66,8 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(
         Tag, verbose_name='Теги', help_text='Выберите один или более тегов')
     cooking_time = models.PositiveIntegerField(
-        verbose_name='Время приготовления, минут', default=1)
+        verbose_name='Время приготовления, минут', default=1,
+        validators=[MinValueValidator(1, 'Кол-во должно быть больше 0')])
 
     class Meta:
         ordering = ['-pub_date']
@@ -80,11 +81,13 @@ class Recipe(models.Model):
 class IngredientForRecipe(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    amount = models.PositiveIntegerField(verbose_name='Кол-во', default=1)
+    amount = models.PositiveIntegerField(
+        verbose_name='Кол-во', default=1,
+        validators=[MinValueValidator(1, 'Кол-во должно быть больше 0')])
 
     class Meta:
         verbose_name = 'Кол-во ингредиента в рецепте'
-        verbose_name_plural = 'Кол-во ингредиента в рецепте'
+        verbose_name_plural = verbose_name
 
     def __str__(self):
         return f'{self.recipe}: {self.ingredient}'

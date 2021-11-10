@@ -69,7 +69,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             if ingredient['id'] in unique_ingredients:
                 raise serializers.ValidationError(
                     {'errors': 'Такой ингредиент уже существует'})
-            elif ingredient['amount'] < 1:
+            if ingredient['amount'] < 1:
                 raise serializers.ValidationError(
                     {'amount': 'Укажите значение > 0'})
             unique_ingredients.append(ingredient['id'])

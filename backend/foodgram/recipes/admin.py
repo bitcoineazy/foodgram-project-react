@@ -1,7 +1,8 @@
 from django.contrib import admin
 from import_export.admin import ImportMixin
 
-from .models import Tag, Ingredient, Recipe, IngredientForRecipe, Favourites
+from .models import (Tag, Ingredient, Recipe,
+                     IngredientForRecipe, Favourites, Order)
 
 
 class TagAdmin(admin.ModelAdmin):
@@ -29,6 +30,12 @@ class IngredientForRecipeAdmin(admin.ModelAdmin):
 
 class FavouritesAdmin(admin.ModelAdmin):
     list_display = ('id', 'recipe', 'user')
+
+
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'recipe', 'pub_date')
+    list_filter = ('id', 'user', 'pub_date')
+    search_fields = ('user', 'recipe', 'pub_date')
 
 
 admin.site.register(Tag, TagAdmin)
