@@ -104,24 +104,34 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, recipe, validated_data):
-        ingredients = validated_data.get('ingredients', recipe.ingredients)
-        tags_data = validated_data.get('tags', recipe.tags)
-        recipe.name = validated_data.get('name', recipe.name)
-        recipe.text = validated_data.get('text', recipe.text)
-        recipe.cooking_time = validated_data.pop(
-            'cooking_time', recipe.cooking_time)
-        recipe.ingredients.clear()
+        ingredients = validated_data.pop('ingredients')
+        tags_data = validated_data.pop('tags')
+        recipe_data = Recipe.objects.filter(id=recipe.id)
+        recipe.update(**validated_data)
+        ingredients_data = [i for i in recipe.ingredients.all()]
+        for ingredient in ingredients:
+            amount = ingredients['amount']
+            ingredient_id = ingredient['id']
+            if IngredientForRecipe.objects.filter(
+                    id=ingredient_id, amount=amount).exists():
+                ingredients_data.remove(
+                    IngredientForRecipe.objects.get(
+                        id=ingredient_id, amount=amount).ingredient)
+            else:
+                IngredientForRecipe.objects.get_or_create(
+                    recipe=recipe,
+                    ingredient=get_object_or_404(Ingredient, id=ingredient_id),
+                    amount=amount
+                )
+        recipe.name = validated_data.pop('name')
+        recipe.text = validated_data.pop('text')
+        recipe.cooking_time = validated_data.pop('cooking_time')
         recipe.tags.clear()
-        ingredient_in_recipe = [IngredientForRecipe(
-            recipe=recipe,
-            ingredient=get_object_or_404(
-                Ingredient, id=ingredient['id']),
-            amount=ingredient['amount']) for ingredient in ingredients]
-        IngredientForRecipe.objects.bulk_create(ingredient_in_recipe)
         if validated_data.get('image') is not None:
             recipe.image = validated_data.get('image', recipe.image)
-        recipe.save()
+        recipe.ingredients.remove(*ingredients_data)
         recipe.tags.set(tags_data)
+        recipe.save()
         return recipe
 
 
