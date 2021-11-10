@@ -107,11 +107,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
         recipe.ingredients.clear()
-        for ingredient in ingredients:
-            IngredientForRecipe.objects.create(
-                recipe=recipe,
-                ingredient=get_object_or_404(Ingredient, id=ingredient['id']),
-                amount=ingredient['amount'])
+        ingredient_in_recipe = [IngredientForRecipe(
+            recipe=recipe,
+            ingredient=get_object_or_404(Ingredient, id=ingredient['id']),
+            amount=ingredient['amount']) for ingredient in ingredients]
+        IngredientForRecipe.objects.bulk_create(ingredient_in_recipe)
         if validated_data.get('image') is not None:
             recipe.image = validated_data.get('image', recipe.image)
         recipe.name = validated_data.pop('name')
