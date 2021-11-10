@@ -58,7 +58,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         request = self.context['request']
-        ingredients = self.initial_data.get('ingredients')
+        ingredients = data['ingredients']
         exist_recipe = Recipe.objects.filter(name=data['name']).exists()
         if request.method == 'POST' and exist_recipe:
             raise serializers.ValidationError({
@@ -73,7 +73,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     {'amount': 'Укажите значение > 0'})
             unique_ingredients.add(ingredient['id'])
-        data['ingredients'] = ingredients
         return data
 
     def get_is_in_shopping_cart(self, obj):
@@ -89,13 +88,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         return Favourites.objects.filter(
             user=request.user, recipe=obj).exists()
 
-    def make_ingredients_for_recipe(self, recipe, ingredients):
-        ingredients_in_recipe = [IngredientForRecipe(
-            recipe=recipe,
-            ingredient=get_object_or_404(Ingredient, id=ingredient['id']),
-            amount=ingredient['amount']) for ingredient in ingredients]
-        IngredientForRecipe.objects.bulk_create(ingredients_in_recipe)
-
     def create(self, validated_data):
         request = self.context.get('request')
         ingredients = validated_data.pop('ingredients')
@@ -103,23 +95,33 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(
             author=request.user, **validated_data)
         recipe.tags.set(tags_data)
-        self.make_ingredients_for_recipe(recipe, ingredients)
+        ingredient_in_recipe = [IngredientForRecipe(
+            recipe=recipe,
+            ingredient=get_object_or_404(Ingredient, id=ingredient['id']),
+            amount=ingredient['amount']) for ingredient in ingredients]
+        IngredientForRecipe.objects.bulk_create(ingredient_in_recipe)
         recipe.save()
         return recipe
 
     def update(self, recipe, validated_data):
-        ingredients = validated_data.get('ingredients')
-        tags_data = validated_data.get('tags')
-        recipe.image = validated_data.get('image', recipe.image)
+        ingredients = validated_data.get('ingredients', recipe.ingredients)
+        tags_data = validated_data.get('tags', recipe.tags)
         recipe.name = validated_data.get('name', recipe.name)
         recipe.text = validated_data.get('text', recipe.text)
-        recipe.cooking_time = validated_data.get(
+        recipe.cooking_time = validated_data.pop(
             'cooking_time', recipe.cooking_time)
+        recipe.ingredients.clear()
         recipe.tags.clear()
-        recipe.tags.set(tags_data)
-        IngredientForRecipe.objects.filter(recipe=recipe).all().delete()
-        self.make_ingredients_for_recipe(recipe, ingredients)
+        ingredient_in_recipe = [IngredientForRecipe(
+            recipe=recipe,
+            ingredient=get_object_or_404(
+                Ingredient, id=ingredient['id']),
+            amount=ingredient['amount']) for ingredient in ingredients]
+        IngredientForRecipe.objects.bulk_create(ingredient_in_recipe)
+        if validated_data.get('image') is not None:
+            recipe.image = validated_data.get('image', recipe.image)
         recipe.save()
+        recipe.tags.set(tags_data)
         return recipe
 
 
