@@ -103,23 +103,31 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe.save()
         return recipe
 
-    def update(self, recipe, validated_data):
-        recipe.image = validated_data.get('image', recipe.image)
-        recipe.name = validated_data.get('name', recipe.name)
-        recipe.text = validated_data.get('text', recipe.text)
-        recipe.cooking_time = validated_data.get(
-            'cooking_time', recipe.cooking_time)
-        recipe.tags.clear()
-        tags_data = self.initial_data.get('tags')
-        recipe.tags.set(tags_data)
-        IngredientForRecipe.objects.filter(recipe=recipe).all().delete()
-        for ingredient in validated_data.get('ingredients'):
-            IngredientForRecipe.objects.create(
-                recipe=recipe, ingredient=get_object_or_404(
-                    Ingredient, id=ingredient['id']),
-                amount=ingredient['amount'])
-        recipe.save()
-        return recipe
+    def update(self, instance, validated_data):
+        ingredients_data = validated_data.pop('ingredients')
+        tags_data = validated_data.pop('tags')
+        recipe = Recipe.objects.filter(id=instance.id)
+        recipe.update(**validated_data)
+        ingredients_instance = [
+            ingredient for ingredient in instance.ingredients.all()]
+        for item in ingredients_data:
+            amount = item['amount']
+            ingredient_id = item['id']
+            if IngredientForRecipe.objects.filter(
+                    id=ingredient_id, amount=amount).exists():
+                ingredients_instance.remove(
+                    IngredientForRecipe.objects.get(id=ingredient_id,
+                                                    amount=amount).ingredient)
+            else:
+                IngredientForRecipe.objects.get_or_create(
+                    recipe=instance,
+                    ingredient=get_object_or_404(Ingredient, id=ingredient_id),
+                    amount=amount)
+        if validated_data.get('image') is not None:
+            instance.image = validated_data.get('image', instance.image)
+        instance.ingredients.remove(*ingredients_instance)
+        instance.tags.set(tags_data)
+        return instance
 
 
 class FavouriteSerializer(serializers.ModelSerializer):
