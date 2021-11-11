@@ -83,10 +83,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
             return False
-        if not Order.objects.filter(user=request.user).exists():
-            raise serializers.ValidationError(
-                {'empty_cart': {'Корзина пуста, перейдите на вкладку'
-                                ' рецепты, чтобы обновить список покупок'}})
         return Order.objects.filter(user=request.user, recipe=obj).exists()
 
     def get_is_favorited(self, obj):
