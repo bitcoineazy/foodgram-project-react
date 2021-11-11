@@ -37,10 +37,10 @@ class IngredientForRecipeCreateSerializer(IngredientForRecipeSerializer):
     amount = serializers.IntegerField(write_only=True)
 
     def to_representation(self, instance):
-        recipe = [i for i in instance.recipe_set.all()]
-        return IngredientForRecipeSerializer(
-            IngredientForRecipe.objects.filter(
-                recipe=recipe[0].id), many=True).data
+        ingredient_in_recipe = [
+            item for item in
+            IngredientForRecipe.objects.filter(ingredient=instance)]
+        return IngredientForRecipeSerializer(ingredient_in_recipe).data
 
 
 class RecipeSerializer(serializers.ModelSerializer):
