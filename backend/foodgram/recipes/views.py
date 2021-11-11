@@ -36,7 +36,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     filter_backends = [rest_framework.DjangoFilterBackend]
     filter_class = RecipeFilter
     pagination_class = PageNumberPagination
-    permission_classes = [AdminOrAuthorOrReadOnly, ]
+    permission_classes = [AdminOrAuthorOrReadOnly]
 
     def get_queryset(self):
         queryset = Recipe.objects.all()
@@ -90,8 +90,7 @@ class CartView(APIView):
         recipe = get_object_or_404(Recipe, id=recipe_id)
         serializer = OrderSerializer(
             data={'user': user.id, 'recipe': recipe.id},
-            context={'request': request}
-        )
+            context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save(recipe=recipe, user=request.user)
         serializer = RecipeInSubscriptionSerializer(recipe)

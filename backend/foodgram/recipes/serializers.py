@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from drf_extra_fields.fields import Base64ImageField
+from rest_framework.decorators import permission_classes
 
 from users.serializers import CustomUserSerializer
 from .models import (Tag, Ingredient, IngredientForRecipe, Favourites,
@@ -64,6 +65,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({
                 'errors': f"Рецепт с таким названием: {data['name']} уже "
                           f"существует"})
+        if data['cooking_time'] < 1:
+            raise serializers.ValidationError(
+                {'cooking_time': 'Время приготовления должно быть больше 0'})
         unique_ingredients = set()
         for ingredient in ingredients:
             if ingredient['id'] in unique_ingredients:
@@ -71,7 +75,8 @@ class RecipeSerializer(serializers.ModelSerializer):
                     {'errors': 'Такой ингредиент уже существует'})
             if ingredient['amount'] < 1:
                 raise serializers.ValidationError(
-                    {'amount': 'Укажите значение > 0'})
+                    {'amount': f'Кол-во ингредиента {ingredient["name"]}'
+                               f' должно быть больше 0'})
             unique_ingredients.add(ingredient['id'])
         return data
 
@@ -110,9 +115,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe_data.update(**validated_data)
         ingredients_instance = [
             ingredient for ingredient in recipe.ingredients.all()]
-        for item in ingredients_data:
-            amount = item['amount']
-            ingredient_id = item['id']
+        for ingredient in ingredients_data:
+            amount = ingredient['amount']
+            ingredient_id = ingredient['id']
             if IngredientForRecipe.objects.filter(
                     id=ingredient_id, amount=amount).exists():
                 ingredients_instance.remove(

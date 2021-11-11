@@ -5,7 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
 
+from recipes.models import Order
 from .models import Follow, CustomUser
 from .serializers import FollowSerializer, GetFollowingsSerializer
 
@@ -27,7 +29,8 @@ class CustomUserViewSet(UserViewSet):
             return Response(serializer.data, status=HTTP_201_CREATED)
         follow = get_object_or_404(Follow, user=request.user, author__id=id)
         follow.delete()
-        return Response(f'{request.user} отписался от {follow.author}',
+        return Response(
+            {'message': f'{request.user} отписался от {follow.author}'},
                         status=HTTP_204_NO_CONTENT)
 
     @action(detail=False,
@@ -44,3 +47,14 @@ class CustomUserViewSet(UserViewSet):
         serializer = GetFollowingsSerializer(
             result_page, many=True, context={'current_user': request.user})
         return paginator.get_paginated_response(serializer.data)
+
+    @action(detail=False,
+            methods=['GET'],
+            url_path='cart',
+            url_name='cart',
+            permission_classes=[IsAuthenticated])
+    def user_cart(self, request):
+        if not Order.objects.filter(user=request.user).exists():
+            raise ValidationError(
+                {'empty_cart': {'Корзина пуста, перейдите на вкладку'
+                                ' рецепты, чтобы обновить список покупок'}})
