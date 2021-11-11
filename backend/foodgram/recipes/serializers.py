@@ -104,28 +104,20 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, recipe, validated_data):
-        ingredients = validated_data.pop('ingredients')
-        tags_data = validated_data.pop('tags')
-        recipe_data = Recipe.objects.filter(id=recipe.id)
-        recipe_data.update(**validated_data)
-        ingredients_data = [i for i in recipe.ingredients.all()]
-        for ingredient in ingredients:
-            amount = ingredients['amount']
-            ingredient_id = ingredient['id']
-            if IngredientForRecipe.objects.filter(
-                    id=ingredient_id, amount=amount).exists():
-                ingredients_data.remove(
-                    IngredientForRecipe.objects.get(
-                        id=ingredient_id, amount=amount).ingredient)
-            else:
-                IngredientForRecipe.objects.get_or_create(
-                    recipe=recipe,
-                    ingredient=get_object_or_404(Ingredient, id=ingredient_id),
-                    amount=amount)
-        if validated_data.get('image') is not None:
-            recipe.image = validated_data.get('image', recipe.image)
-        recipe.ingredients.remove(*ingredients_data)
+        recipe.image = validated_data.get('image', recipe.image)
+        recipe.name = validated_data.get('name', recipe.name)
+        recipe.text = validated_data.get('text', recipe.text)
+        recipe.cooking_time = validated_data.get(
+            'cooking_time', recipe.cooking_time)
+        recipe.tags.clear()
+        tags_data = self.initial_data.get('tags')
         recipe.tags.set(tags_data)
+        IngredientForRecipe.objects.filter(recipe=recipe).all().delete()
+        for ingredient in validated_data.get('ingredients'):
+            IngredientForRecipe.objects.create(recipe=recipe,
+                                               ingredient_id=ingredient['id'],
+                                               amount=ingredient['amount'])
+        recipe.save()
         return recipe
 
 
