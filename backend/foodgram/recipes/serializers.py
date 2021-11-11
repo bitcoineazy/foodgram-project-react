@@ -114,9 +114,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe.tags.set(tags_data)
         IngredientForRecipe.objects.filter(recipe=recipe).all().delete()
         for ingredient in validated_data.get('ingredients'):
-            IngredientForRecipe.objects.create(recipe=recipe,
-                                               ingredient_id=ingredient['id'],
-                                               amount=ingredient['amount'])
+            IngredientForRecipe.objects.create(
+                recipe=recipe, ingredient=get_object_or_404(
+                    Ingredient, id=ingredient['id']),
+                amount=ingredient['amount'])
         recipe.save()
         return recipe
 
