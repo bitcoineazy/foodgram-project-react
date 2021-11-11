@@ -103,13 +103,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe.save()
         return recipe
 
-    def update(self, instance, validated_data):
+    def update(self, recipe, validated_data):
         ingredients_data = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
-        recipe = Recipe.objects.filter(id=instance.id)
-        recipe.update(**validated_data)
+        recipe_data = Recipe.objects.filter(id=recipe.id)
+        recipe_data.update(**validated_data)
         ingredients_instance = [
-            ingredient for ingredient in instance.ingredients.all()]
+            ingredient for ingredient in recipe.ingredients.all()]
         for item in ingredients_data:
             amount = item['amount']
             ingredient_id = item['id']
@@ -120,14 +120,14 @@ class RecipeSerializer(serializers.ModelSerializer):
                                                     amount=amount).ingredient)
             else:
                 IngredientForRecipe.objects.get_or_create(
-                    recipe=instance,
-                    ingredient=get_object_or_404(Ingredient, id=ingredient_id),
-                    amount=amount)
+                    recipe=recipe,
+                    ingredient=get_object_or_404(
+                        Ingredient, id=ingredient_id), amount=amount)
         if validated_data.get('image') is not None:
-            instance.image = validated_data.get('image', instance.image)
-        instance.ingredients.remove(*ingredients_instance)
-        instance.tags.set(tags_data)
-        return instance
+            recipe.image = validated_data.get('image', recipe.image)
+        recipe.ingredients.remove(*ingredients_instance)
+        recipe.tags.set(tags_data)
+        return recipe
 
 
 class FavouriteSerializer(serializers.ModelSerializer):

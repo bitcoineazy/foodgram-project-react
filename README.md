@@ -1,7 +1,7 @@
 # «Продуктовый помощник» — сайт Foodgram
 
 ![foodgram_workflow](https://github.com/bitcoineazy/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
-![Project website](https://img.shields.io/website-up-down-green-red/http/51.250.0.13.svg)
+![Project website](https://img.shields.io/website-up-down-green-red/http/51.250.5.117.svg)
 
 ## Описание
 
@@ -45,15 +45,19 @@ DB_PORT=5432
 2. Запушить образ на свой dockerhub - ```sudo docker push username/container```
 3. Модифицировать infra/docker-compose.yml на свой контейнер
 
+Для загрузки данных и редактирования файлов контейнера
+1. ```sudo docker exec -u 0 -it {id_контейнера из docker ps} /bin/sh```
+2. ```apt update && apt install (nano, vim при необходимости)```
+
 ## Доступ к сайту и админке
 
-- Foodgram находится по адресу: [51.250.0.13](http://51.250.0.13)
-- Админ-зона находится на сервере [51.250.0.13/admin/](http://51.250.0.13/admin/) или локально [0.0.0.0/admin](https://0.0.0.0/admin)
+- Foodgram находится по адресу: [51.250.5.117](http://51.250.5.117)
+- Админ-зона находится на сервере [51.250.5.117/admin/](http://51.250.5.117/admin/) или локально [0.0.0.0/admin](https://0.0.0.0/admin)
 - Данные для входа в админ-зону ```login: admin@admin.com password: admin```
 
 ## Документация
 
-- Находится на сервере [51.250.0.13/api/docs/redoc.html](http://51.250.0.13/api/docs/redoc.html) или локально [0.0.0.0//api/docs/redoc.html](https://0.0.0.0/api/docs/redoc.html)
+- Находится на сервере [51.250.5.117/api/docs/redoc.html](http://51.250.5.117/api/docs/redoc.html) или локально [0.0.0.0//api/docs/redoc.html](https://0.0.0.0/api/docs/redoc.html)
 - Каждый ресурс описан в документации: указаны эндпоинты (адреса, по которым можно сделать запрос), разрешённые типы запросов, права доступа и дополнительные параметры, если это необходимо.
 
 ## Автор
