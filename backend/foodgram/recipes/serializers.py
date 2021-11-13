@@ -64,6 +64,10 @@ class RecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({
                 'errors': f"Рецепт с таким названием: {data['name']} уже "
                           f"существует"})
+        if data['cooking_time'] < 1:
+            raise serializers.ValidationError(
+                {'cooking_time':
+                    'Время приготовления не может быть меньше 1'})
         unique_ingredients = set()
         for ingredient in ingredients:
             if ingredient['id'] in unique_ingredients:

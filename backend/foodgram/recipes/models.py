@@ -2,8 +2,14 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from colorfield.fields import ColorField
 from django.core.validators import validate_slug, MinValueValidator
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
+
+
+def validate_cooking_time(value):
+    if value < 1:
+        raise ValidationError('Время приготовления должно быть больше 0')
 
 
 class Tag(models.Model):
@@ -63,9 +69,8 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(
         Tag, verbose_name='Теги', help_text='Выберите один или более тегов')
     cooking_time = models.IntegerField(
-        verbose_name='Время приготовления, минут', validators=[
-            MinValueValidator(
-                1, message='Время приготовления должно быть больше 0')])
+        verbose_name='Время приготовления, минут',
+        validators=[validate_cooking_time])
 
     class Meta:
         ordering = ['-pub_date']
