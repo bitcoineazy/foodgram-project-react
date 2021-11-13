@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from colorfield.fields import ColorField
-from django.core.validators import RegexValidator, MinValueValidator
+from django.core.validators import validate_slug, MinValueValidator
 
 User = get_user_model()
 
@@ -18,10 +18,7 @@ class Tag(models.Model):
         unique=True,
         null=True)
     slug = models.SlugField(verbose_name='slug', max_length=64, unique=True,
-                            validators=[
-                                RegexValidator(
-                                    regex=r'^[-a-zA-Z0-9_]+$',
-                                    message='Недопустимые символы')])
+                            validators=[validate_slug])
 
     class Meta:
         verbose_name = 'Тэг'
@@ -65,9 +62,10 @@ class Recipe(models.Model):
         help_text='Укажите ингредиенты и их количество')
     tags = models.ManyToManyField(
         Tag, verbose_name='Теги', help_text='Выберите один или более тегов')
-    cooking_time = models.PositiveIntegerField(
+    cooking_time = models.IntegerField(
         verbose_name='Время приготовления, минут', default=1,
-        validators=[MinValueValidator(1, 'Кол-во должно быть больше 0')])
+        validators=[
+            MinValueValidator(1, 'Время приготовления должно быть больше 0')])
 
     class Meta:
         ordering = ['-pub_date']
@@ -83,9 +81,10 @@ class IngredientForRecipe(models.Model):
                                    related_name='ingredients_amounts')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
                                related_name='ingredients_amounts')
-    amount = models.PositiveIntegerField(
-        verbose_name='Кол-во', default=1,
-        validators=[MinValueValidator(1, 'Кол-во должно быть больше 0')])
+    amount = models.IntegerField(
+        verbose_name='Кол-во ингредиента', default=1,
+        validators=[
+            MinValueValidator(1, 'Кол-во ингредиента должно быть больше 0')])
 
     class Meta:
         verbose_name = 'Кол-во ингредиента в рецепте'

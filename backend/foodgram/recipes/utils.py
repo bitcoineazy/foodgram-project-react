@@ -1,4 +1,4 @@
-from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes
 from django.http.response import HttpResponse
 from rest_framework.permissions import IsAuthenticated
 

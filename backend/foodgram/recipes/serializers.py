@@ -1,7 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework.decorators import permission_classes
 
 from users.serializers import CustomUserSerializer
 from .models import (Tag, Ingredient, IngredientForRecipe, Favourites,
@@ -65,9 +64,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({
                 'errors': f"Рецепт с таким названием: {data['name']} уже "
                           f"существует"})
-        if data['cooking_time'] < 1:
-            raise serializers.ValidationError(
-                {'cooking_time': 'Время приготовления должно быть больше 0'})
         unique_ingredients = set()
         for ingredient in ingredients:
             if ingredient['id'] in unique_ingredients:

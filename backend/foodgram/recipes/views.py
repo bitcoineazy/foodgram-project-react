@@ -20,14 +20,14 @@ from .filters import RecipeFilter, IngredientFilter
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = [AllowAny, ]
     pagination_class = None
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = [AllowAny, ]
     pagination_class = None
     filterset_class = IngredientFilter
 
@@ -36,7 +36,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     filter_backends = [rest_framework.DjangoFilterBackend]
     filter_class = RecipeFilter
     pagination_class = PageNumberPagination
-    permission_classes = [AdminOrAuthorOrReadOnly]
+    permission_classes = [AdminOrAuthorOrReadOnly, ]
 
     def get_queryset(self):
         queryset = Recipe.objects.all()
@@ -82,7 +82,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
 
 class CartView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated, ]
     http_method_names = ['get', 'delete']
 
     def get(self, request, recipe_id):
