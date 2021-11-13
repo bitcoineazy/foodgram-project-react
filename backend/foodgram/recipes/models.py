@@ -63,9 +63,9 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(
         Tag, verbose_name='Теги', help_text='Выберите один или более тегов')
     cooking_time = models.IntegerField(
-        verbose_name='Время приготовления, минут', default=1,
-        validators=[
-            MinValueValidator(1, 'Время приготовления должно быть больше 0')])
+        verbose_name='Время приготовления, минут', validators=[
+            MinValueValidator(
+                1, message='Время приготовления должно быть больше 0')])
 
     class Meta:
         ordering = ['-pub_date']
@@ -82,9 +82,9 @@ class IngredientForRecipe(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
                                related_name='ingredients_amounts')
     amount = models.IntegerField(
-        verbose_name='Кол-во ингредиента', default=1,
-        validators=[
-            MinValueValidator(1, 'Кол-во ингредиента должно быть больше 0')])
+        verbose_name='Кол-во ингредиента', validators=[
+            MinValueValidator(
+                1, message='Кол-во ингредиента должно быть больше 0')])
 
     class Meta:
         verbose_name = 'Кол-во ингредиента в рецепте'
